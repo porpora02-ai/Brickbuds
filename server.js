@@ -1,26 +1,35 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const cors = require("cors");
+const path = require("path");
 
 const authRoutes = require("./auth");
 
 const app = express();
 
-app.use(cors());
 app.use(express.json());
+app.use(cors());
 
-mongoose.connect(
-    "YOUR_MONGODB_LINK"
-)
-.then(() => {
-    console.log("MongoDB Connected");
-})
-.catch((err) => {
-    console.log(err);
-});
+// MongoDB
+mongoose.connect("YOUR_MONGODB_LINK")
+.then(() => console.log("MongoDB Connected"))
+.catch(err => console.log(err));
 
+// API routes
 app.use("/api/auth", authRoutes);
 
-app.listen(3000, () => {
-    console.log("Server running on port 3000");
+// serve frontend
+app.use(express.static(__dirname));
+
+app.get("/", (req,res)=>{
+    res.sendFile(path.join(__dirname, "index.html"));
+});
+
+app.get("/games", (req,res)=>{
+    res.sendFile(path.join(__dirname, "games.html"));
+});
+
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, ()=>{
+    console.log("Server running on port " + PORT);
 });
